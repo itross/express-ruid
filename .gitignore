@@ -1,0 +1,16 @@
+.idea
+.vscode
+.DS_Store
+*.log
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+
+npm-debug.log
+node_modules
+
+coverage
