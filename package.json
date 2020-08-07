@@ -1,6 +1,6 @@
 {
   "name": "express-ruid",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Express.js Request Unique ID middleware",
   "main": "index.js",
   "scripts": {
@@ -23,9 +23,6 @@
     "url": "https://github.com/itross/express-ruid/issues"
   },
   "homepage": "https://github.com/itross/express-ruid#readme",
-  "dependencies": {
-    "crypto": "^1.0.1"
-  },
   "devDependencies": {
     "express": "^4.17.1",
     "jest": "^26.2.2",

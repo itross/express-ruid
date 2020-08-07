@@ -67,7 +67,7 @@ request-id: 7522@redrock/dafbb8dd5eb2193ee436e8b4-0000000000000001
 * **prefixRoot**: (_string | function_) to specify custom prefix part of the request id string. Default: `'<process-pid>@<machine-hostname>'`
 * **prefixSeparator**: (_string_) to set custom separator between prefix and unique part of the request id string. Default: `'/'`
 * **upBytes**: (_number_) number of bytes to generate the unique part of the riquest id. Default: `12`
-* **isSeparator**: (_string_) to set custom separator between the unique part and the sequene number of the request id string. Default: `'-'`
+* **idSeparator**: (_string_) to set custom separator between the unique part and the sequene number of the request id string. Default: `'-'`
 * **isMax**: (_number_) the max number for the sequence number in the request id string. Default: `Number.MAX_SAFE_INTEGER`
 
 #### Sample usage
@@ -113,6 +113,9 @@ HTTP/1.1 200 OK
 X-Powered-By: Express
 request-id: 7522@redrock/4f1704658fdd4d797c833563-0000000000002491
 ```
+### Acknowledgements
+This project is inspired by [express-request-id](https://www.npmjs.com/package/express-request-id) and the [chi request_id](https://github.com/go-chi/chi/blob/master/middleware/request_id.go) middleware.
+
 ### License
 
 express-ruid is [MIT licensed](LICENSE).
