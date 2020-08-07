@@ -8,6 +8,7 @@ In case a request has the _request-id_ header valued, then the middleware will u
 * [Installation](#installation)
 * [Request id format](#request-id-format)
 * [Request attribute](#request-attribute)
+* [Express app locals attribute](#Express-app-locals-attribute)
 * [Response header](#response-header)
 * [Max id and unique part regeneration](#max-id-and-unique-part-regeneration)
 * [Options](#options)
@@ -40,6 +41,32 @@ app.get('/', (req, res) => {
 });
 ```
 
+#### Express app locals attribute
+Starting from v1.0.2 you can choose to set the request id even as app.locals attribute setting the _setInLocals_ option to true (which is the default, 'cause we thing is so useful). The default attribute name is yet _rid_, but it can be configured.
+
+The request id attribute in _app.locals_ can be useful in all those situations where it is not possible to have direct access to the request object.
+```js
+// ...
+function doAwesomeThingsService(app) {
+    return {
+        getAllStrangerThings() {
+            const rid = app.locals.rid;
+            // ...
+        },
+        saveFantasticThing() {
+            const rid = app.locals.rid;
+            try {
+                // .....
+            } catch(err) {
+                mySuperErrorNotificationAsyncService.notify(rid, err);
+            }
+        },
+        // just your imagination...
+    }
+}
+module.exports = doAwesomeThingsService;
+```
+
 #### Response header
 The request id will be returned as response header. It is added to the Express res object headers as _request-id_ header. The name for the response header is configurable.
 Note that you can choose to not add the res header, by configuring the _setHeader_ option to _false_, as described in the options section.
@@ -62,6 +89,7 @@ request-id: 7522@redrock/dafbb8dd5eb2193ee436e8b4-0000000000000001
 #### Options
 ```ruid()``` supports the following options:
 * **setHeader**: (_boolean_) to add or not the response header. Default: `true`
+* **setInLocals**: (_boolean_) to set or not the request id as Express app.locals attribute. Default is _true_
 * **header**: (_string_) to specify the response header name. Default: `'request-id'`
 * **attribute**: (_string_) to specify the attribute name to set the request id into to Express req object. Default: `'rid'`
 * **prefixRoot**: (_string | function_) to specify custom prefix part of the request id string. Default: `'<process-pid>@<machine-hostname>'`

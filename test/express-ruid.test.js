@@ -7,10 +7,10 @@
 * Use of this source code is governed by a MIT license.
 * You can find the MIT license terms for this source code in the LICENSE file.
 *
-* test/express-requid.test.js
+* test/express-ruid.test.js
 */
 
-const requid = require('../lib/express-ruid');
+const ruid = require('../lib/express-ruid');
 const supertest = require('supertest');
 const express = require('express');
 const os = require('os');
@@ -19,7 +19,7 @@ describe('request id generation', function () {
 
     it('should have "rid" as request attribute', async function (done) {
         const app = express();
-        app.use(requid());
+        app.use(ruid());
         app.get('/', function (req, res) {
             expect(req).exists;
             expect(req).toHaveProperty('rid');
@@ -33,7 +33,7 @@ describe('request id generation', function () {
 
     it('should have rid with prefix === hostname', async function (done) {
         const app = express();
-        app.use(requid());
+        app.use(ruid());
         app.get('/', function (req, res) {
             expect(req).exists;
             expect(req.rid).toMatch(new RegExp(os.hostname(), 'gi'));
@@ -47,7 +47,7 @@ describe('request id generation', function () {
 
     it('should have rid with custom prefix', async function (done) {
         const app = express();
-        app.use(requid({
+        app.use(ruid({
             prefixRoot: 'CUSTOM'
         }));
         app.get('/', function (req, res) {
@@ -63,7 +63,7 @@ describe('request id generation', function () {
 
     it('should have rid with custom prefix as function', async function (done) {
         const app = express();
-        app.use(requid({
+        app.use(ruid({
             prefixRoot: () => {
                 return `CUSTOM${os.hostname()}CUSTOM`
             }
@@ -81,7 +81,7 @@ describe('request id generation', function () {
 
     it('should have rid ending with "000001"', async function (done) {
         const app = express();
-        app.use(requid());
+        app.use(ruid());
         app.get('/', function (req, res) {
             expect(req).exists;
             expect(req.rid).toMatch(/.*00001.?$/i);
@@ -95,7 +95,7 @@ describe('request id generation', function () {
 
     it('should have rid with default separators', async function (done) {
         const app = express();
-        app.use(requid());
+        app.use(ruid());
         app.get('/', function (req, res) {
             expect(req).exists;
             expect(req.rid).toMatch(/.*\/.*-.*?$/i);
@@ -109,7 +109,7 @@ describe('request id generation', function () {
 
     it('should have rid with "#" as prefix separator and "@" as sequence separator', async function (done) {
         const app = express();
-        app.use(requid({ prefixSeparator: '#', idSeparator: '@' }));
+        app.use(ruid({ prefixSeparator: '#', idSeparator: '@' }));
         app.get('/', function (req, res) {
             expect(req).exists;
             expect(req.rid).toMatch(/.*#.*@.*?$/i);
@@ -123,7 +123,7 @@ describe('request id generation', function () {
 
     it('should have response "request-id" header', async function (done) {
         const app = express();
-        app.use(requid());
+        app.use(ruid());
         app.get('/', function (req, res) {
             res.send('it works');
         });
@@ -136,7 +136,7 @@ describe('request id generation', function () {
 
     it('should have custom response header "X-Request-Id"', async function (done) {
         const app = express();
-        app.use(requid({ header: 'X-Request-Id' }));
+        app.use(ruid({ header: 'X-Request-Id' }));
         app.get('/', function (req, res) {
             res.send('it works');
         });
@@ -146,15 +146,28 @@ describe('request id generation', function () {
 
         done();
     });
+
+    it('should not have response "request-id" header', async function (done) {
+        const app = express();
+        app.use(ruid({ setHeader: false }));
+        app.get('/', function (req, res) {
+            res.send('it works');
+        });
+
+        const res = await supertest(app).get('/').expect(200);
+        expect(res.header).not.toHaveProperty('request-id');
+
+        done();
+    });
 });
 
-describe('request id in header and prefix reset', function () {
+describe('request id in header, prefix reset and app.locals', function () {
 
     it('should recive "request-id" header and req.rid === header value', async function (done) {
         const headerName = 'request-id';
         const headerValue = 'fake-request-id';
         const app = express();
-        app.use(requid());
+        app.use(ruid());
         app.get('/', function (req, res) {
             expect(req).exists;
             expect(req.headers).toHaveProperty(headerName);
@@ -178,7 +191,7 @@ describe('request id in header and prefix reset', function () {
 
         const app = express();
         const agent = supertest(app);
-        app.use(requid({ idMax: 2 }));
+        app.use(ruid({ idMax: 2 }));
         app.get('/', function (req, res) {
             expect(req).exists;
             res.send('it works');
@@ -201,6 +214,47 @@ describe('request id in header and prefix reset', function () {
 
         // expect "xxxxxxxxxx" !== "yyyyyyyyy"
         expect(prefixUniquePart(rid1)).not.toBe(prefixUniquePart(rid3));
+        done();
+    });
+
+    it('should have rid in app.locals.rid', async function (done) {
+        const app = express();
+        app.use(ruid());
+        app.get('/', function (req, res) {
+            expect(req).exists;
+            expect(req.app.locals.rid).exists;
+            expect(req.app.locals.rid).toBe(req.rid);
+            res.send('it works');
+        });
+
+        await supertest(app).get('/').expect(200);
+        done();
+    });
+
+    it('should have rid with custom attribute name "requestId" in req and in app.locals', async function (done) {
+        const app = express();
+        app.use(ruid({ attribute: 'requestId' }));
+        app.get('/', function (req, res) {
+            expect(req).exists;
+            expect(req.app.locals.requestId).exists;
+            expect(req.app.locals.requestId).toBe(req.requestId);
+            res.send('it works');
+        });
+
+        await supertest(app).get('/').expect(200);
+        done();
+    });
+
+    it('should not have request id in app.locals', async function (done) {
+        const app = express();
+        app.use(ruid({ attribute: 'requestId', setInLocals: false }));
+        app.get('/', function (req, res) {
+            expect(req).exists;
+            expect(req.app.locals.requestId).not.exists;
+            res.send('it works');
+        });
+
+        await supertest(app).get('/').expect(200);
         done();
     });
 
