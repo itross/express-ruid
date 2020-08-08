@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 ```
 
 #### Express http context
-Starting from v1.0.2 you can choose to set the request id even in the http context of your app configuring the _setInLocals_ option to true. The default attribute name is yet _rid_, but it can be configured.
+Starting from v1.1.0 you can choose to set the request id even in the http context of your app configuring the _setInContext_ option to true. The default attribute name is yet _rid_, but it can be configured.
 
 The request id attribute in _http context_ can be useful in all those situations where it is not possible to have direct access to the request object.
 
@@ -117,7 +117,7 @@ request-id: 7522@redrock/dafbb8dd5eb2193ee436e8b4-0000000000000001
 #### Options
 ```ruid()``` supports the following options:
 * **setHeader**: (_boolean_) to add or not the response header. Default: `true`
-* **setInLocals**: (_boolean_) to set or not the request id as Express app.locals attribute. Default is _true_
+* **setInContext**: (_boolean_) to set or not the request id into the _Http Context_. Default is _false_
 * **header**: (_string_) to specify the response header name. Default: `'request-id'`
 * **attribute**: (_string_) to specify the attribute name to set the request id into to Express req object. Default: `'rid'`
 * **prefixRoot**: (_string | function_) to specify custom prefix part of the request id string. Default: `'<process-pid>@<machine-hostname>'`
