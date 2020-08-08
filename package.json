@@ -1,6 +1,6 @@
 {
   "name": "express-ruid",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Express.js Request Unique ID middleware",
   "main": "index.js",
   "scripts": {
@@ -27,5 +27,8 @@
     "express": "^4.17.1",
     "jest": "^26.2.2",
     "supertest": "^4.0.2"
+  },
+  "dependencies": {
+    "express-http-context": "^1.2.4"
   }
 }

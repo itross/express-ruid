@@ -8,7 +8,7 @@ In case a request has the _request-id_ header valued, then the middleware will u
 * [Installation](#installation)
 * [Request id format](#request-id-format)
 * [Request attribute](#request-attribute)
-* [Express app locals attribute](#Express-app-locals-attribute)
+* [Express http context](#Express-http-context)
 * [Response header](#response-header)
 * [Max id and unique part regeneration](#max-id-and-unique-part-regeneration)
 * [Options](#options)
@@ -41,20 +41,48 @@ app.get('/', (req, res) => {
 });
 ```
 
-#### Express app locals attribute
-Starting from v1.0.2 you can choose to set the request id even as app.locals attribute setting the _setInLocals_ option to true (which is the default, 'cause we thing is so useful). The default attribute name is yet _rid_, but it can be configured.
+#### Express http context
+Starting from v1.0.2 you can choose to set the request id even in the http context of your app configuring the _setInLocals_ option to true. The default attribute name is yet _rid_, but it can be configured.
 
-The request id attribute in _app.locals_ can be useful in all those situations where it is not possible to have direct access to the request object.
+The request id attribute in _http context_ can be useful in all those situations where it is not possible to have direct access to the request object.
+
+To get this job done, express-ruid needs you to initialize the [express-http-context](https://www.npmjs.com/package/express-http-context) and use its middleware in your app.
+
+> If you don't want to set request id in http context, you can leave the _setInContext_ option configuredwith its default (false), and you are free to no use the espress-http-context middleware in your app.
+>But note that if you configure _setInContext_ to true without using the express-http-context middleware in your app, you will not have any request id in context.
+
+All of the warnings stated by the express-http-context lib remains:
+
+> Use the middleware immediately before the first middleware that needs to have access to the context. You won't have access to the context in any middleware "used" before this one.
+>
+>Note that some popular middlewares (such as body-parser, express-jwt) may cause context to get lost. To workaround such issues, you are advised to use any third party middleware that does NOT need the context BEFORE you use this middleware.
+
 ```js
-// ...
+// app.js
+const ruid = require('express-ruid');
+const httpContext = require('express-http-context');
+const express = require('express);
+
+// be sure to user the httpContext.middleware
+app.use(httpContext.middleware);
+
+// configure the 'setInContext' option to true
+app.use(ruid({ setInContext: true }));
+...
+...
+...
+
+// your-awesome-service.js
+const httpContext = require('express-http-context');
+
 function doAwesomeThingsService(app) {
     return {
         getAllStrangerThings() {
-            const rid = app.locals.rid;
+            const rid = httpContext.get('rid');
             // ...
         },
         saveFantasticThing() {
-            const rid = app.locals.rid;
+            const rid = httpContext.get('rid);
             try {
                 // .....
             } catch(err) {

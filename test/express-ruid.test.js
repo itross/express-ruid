@@ -161,7 +161,7 @@ describe('request id generation', function () {
     });
 });
 
-describe('request id in header, prefix reset and app.locals', function () {
+describe('request id in header, prefix reset', function () {
 
     it('should recive "request-id" header and req.rid === header value', async function (done) {
         const headerName = 'request-id';
@@ -217,40 +217,56 @@ describe('request id in header, prefix reset and app.locals', function () {
         done();
     });
 
-    it('should have rid in app.locals.rid', async function (done) {
+});
+
+
+
+/////////////////////////
+
+describe('request id in httpContext', function () {
+
+    it('should have rid in httpContext', async function (done) {
         const app = express();
+        const httpContext = require('express-http-context');
+        app.use(httpContext.middleware);
+        app.use(ruid({ setInContext: true }));
+        app.get('/', function (req, res) {
+            expect(req).exists;
+            expect(httpContext).exists;
+            expect(httpContext.get('rid')).toBe(req.rid);
+            res.send('it works');
+        });
+
+        await supertest(app).get('/').expect(200);
+        done();
+    });
+
+    it('should have rid with custom attribute name "requestId" in req and in httpContext', async function (done) {
+        const app = express();
+        const httpContext = require('express-http-context');
+        app.use(httpContext.middleware);
+        app.use(ruid({ attribute: 'requestId', setInContext: true }));
+        app.get('/', function (req, res) {
+            expect(req).exists;
+            expect(httpContext).exists;
+            console.log('req.requestId: ' + req.requestId);
+            console.log('in context: ' + httpContext.get("requestId"));
+            expect(httpContext.get('requestId')).toBe(req.requestId);
+            res.send('it works');
+        });
+
+        await supertest(app).get('/').expect(200);
+        done();
+    });
+
+    it('should not have request id in httpContext', async function (done) {
+        const app = express();
+        const httpContext = require('express-http-context');
+        app.use(httpContext.middleware);
         app.use(ruid());
         app.get('/', function (req, res) {
             expect(req).exists;
-            expect(req.app.locals.rid).exists;
-            expect(req.app.locals.rid).toBe(req.rid);
-            res.send('it works');
-        });
-
-        await supertest(app).get('/').expect(200);
-        done();
-    });
-
-    it('should have rid with custom attribute name "requestId" in req and in app.locals', async function (done) {
-        const app = express();
-        app.use(ruid({ attribute: 'requestId' }));
-        app.get('/', function (req, res) {
-            expect(req).exists;
-            expect(req.app.locals.requestId).exists;
-            expect(req.app.locals.requestId).toBe(req.requestId);
-            res.send('it works');
-        });
-
-        await supertest(app).get('/').expect(200);
-        done();
-    });
-
-    it('should not have request id in app.locals', async function (done) {
-        const app = express();
-        app.use(ruid({ attribute: 'requestId', setInLocals: false }));
-        app.get('/', function (req, res) {
-            expect(req).exists;
-            expect(req.app.locals.requestId).not.exists;
+            expect(httpContext.get('rid')).not.exists;
             res.send('it works');
         });
 
