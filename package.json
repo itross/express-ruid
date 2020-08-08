@@ -1,6 +1,6 @@
 {
   "name": "express-ruid",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Express.js Request Unique ID middleware",
   "main": "index.js",
   "scripts": {

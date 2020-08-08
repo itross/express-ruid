@@ -61,7 +61,7 @@ All of the warnings stated by the express-http-context lib remains:
 // app.js
 const ruid = require('express-ruid');
 const httpContext = require('express-http-context');
-const express = require('express);
+const express = require('express');
 
 // be sure to user the httpContext.middleware
 app.use(httpContext.middleware);
