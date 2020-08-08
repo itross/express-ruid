@@ -82,7 +82,7 @@ function doAwesomeThingsService(app) {
             // ...
         },
         saveFantasticThing() {
-            const rid = httpContext.get('rid);
+            const rid = httpContext.get('rid');
             try {
                 // .....
             } catch(err) {
