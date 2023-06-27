@@ -4,7 +4,10 @@ const os = require('os');
 
 const app = express();
 
-app.use(requid());
+app.use(requid({
+    header: 'X-Request-ID',
+    idMax: 3
+}));
 
 app.get('/', function (req, res, next) {
     return res.sendStatus(200);

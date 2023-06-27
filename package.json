@@ -1,8 +1,9 @@
 {
   "name": "express-ruid",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Express.js Request Unique ID middleware",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "jest --verbose --coverage"
   },
@@ -23,12 +24,12 @@
     "url": "https://github.com/itross/express-ruid/issues"
   },
   "homepage": "https://github.com/itross/express-ruid#readme",
-  "devDependencies": {
-    "express": "^4.17.1",
-    "jest": "^26.2.2",
-    "supertest": "^4.0.2"
-  },
   "dependencies": {
     "express-http-context": "^1.2.4"
+  },
+  "devDependencies": {
+    "express": "^4.18.2",
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3"
   }
 }

@@ -17,7 +17,7 @@ const os = require('os');
 
 describe('request id generation', function () {
 
-    it('should have "rid" as request attribute', async function (done) {
+    it('should have "rid" as request attribute', async function () {
         const app = express();
         app.use(ruid());
         app.get('/', function (req, res) {
@@ -27,11 +27,9 @@ describe('request id generation', function () {
         });
 
         await supertest(app).get('/').expect(200);
-
-        done();
     });
 
-    it('should have rid with prefix === hostname', async function (done) {
+    it('should have rid with prefix === hostname', async function () {
         const app = express();
         app.use(ruid());
         app.get('/', function (req, res) {
@@ -41,11 +39,9 @@ describe('request id generation', function () {
         });
 
         await supertest(app).get('/').expect(200);
-
-        done();
     });
 
-    it('should have rid with custom prefix', async function (done) {
+    it('should have rid with custom prefix', async function () {
         const app = express();
         app.use(ruid({
             prefixRoot: 'CUSTOM'
@@ -57,11 +53,9 @@ describe('request id generation', function () {
         });
 
         await supertest(app).get('/').expect(200);
-
-        done();
     });
 
-    it('should have rid with custom prefix as function', async function (done) {
+    it('should have rid with custom prefix as function', async function () {
         const app = express();
         app.use(ruid({
             prefixRoot: () => {
@@ -75,11 +69,9 @@ describe('request id generation', function () {
         });
 
         await supertest(app).get('/').expect(200);
-
-        done();
     });
 
-    it('should have rid ending with "000001"', async function (done) {
+    it('should have rid ending with "000001"', async function () {
         const app = express();
         app.use(ruid());
         app.get('/', function (req, res) {
@@ -89,11 +81,9 @@ describe('request id generation', function () {
         });
 
         await supertest(app).get('/').expect(200);
-
-        done();
     });
 
-    it('should have rid with default separators', async function (done) {
+    it('should have rid with default separators', async function () {
         const app = express();
         app.use(ruid());
         app.get('/', function (req, res) {
@@ -103,11 +93,9 @@ describe('request id generation', function () {
         });
 
         await supertest(app).get('/').expect(200);
-
-        done();
     });
 
-    it('should have rid with "#" as prefix separator and "@" as sequence separator', async function (done) {
+    it('should have rid with "#" as prefix separator and "@" as sequence separator', async function () {
         const app = express();
         app.use(ruid({ prefixSeparator: '#', idSeparator: '@' }));
         app.get('/', function (req, res) {
@@ -117,11 +105,9 @@ describe('request id generation', function () {
         });
 
         await supertest(app).get('/').expect(200);
-
-        done();
     });
 
-    it('should have response "request-id" header', async function (done) {
+    it('should have response "request-id" header', async function () {
         const app = express();
         app.use(ruid());
         app.get('/', function (req, res) {
@@ -130,11 +116,9 @@ describe('request id generation', function () {
 
         const res = await supertest(app).get('/').expect(200);
         expect(res.header).toHaveProperty('request-id');
-
-        done();
     });
 
-    it('should have custom response header "X-Request-Id"', async function (done) {
+    it('should have custom response header "X-Request-Id"', async function () {
         const app = express();
         app.use(ruid({ header: 'X-Request-Id' }));
         app.get('/', function (req, res) {
@@ -143,11 +127,9 @@ describe('request id generation', function () {
 
         const res = await supertest(app).get('/');
         expect(res.header).toHaveProperty('x-request-id');
-
-        done();
     });
 
-    it('should not have response "request-id" header', async function (done) {
+    it('should not have response "request-id" header', async function () {
         const app = express();
         app.use(ruid({ setHeader: false }));
         app.get('/', function (req, res) {
@@ -156,14 +138,12 @@ describe('request id generation', function () {
 
         const res = await supertest(app).get('/').expect(200);
         expect(res.header).not.toHaveProperty('request-id');
-
-        done();
     });
 });
 
 describe('request id in header, prefix reset', function () {
 
-    it('should recive "request-id" header and req.rid === header value', async function (done) {
+    it('should recive "request-id" header and req.rid === header value', async function () {
         const headerName = 'request-id';
         const headerValue = 'fake-request-id';
         const app = express();
@@ -178,10 +158,9 @@ describe('request id in header, prefix reset', function () {
         });
 
         await supertest(app).get('/').set(headerName, headerValue).expect(200);
-        done();
     });
 
-    it('should reset id prefix (idMax = 2)', async function (done) {
+    it('should reset id prefix (idMax = 2)', async function () {
         const prefixUniquePart = (rid) => {
             return rid.substring(
                 rid.lastIndexOf("/") + 1,
@@ -214,7 +193,6 @@ describe('request id in header, prefix reset', function () {
 
         // expect "xxxxxxxxxx" !== "yyyyyyyyy"
         expect(prefixUniquePart(rid1)).not.toBe(prefixUniquePart(rid3));
-        done();
     });
 
 });
@@ -225,7 +203,7 @@ describe('request id in header, prefix reset', function () {
 
 describe('request id in httpContext', function () {
 
-    it('should have rid in httpContext', async function (done) {
+    it('should have rid in httpContext', async function () {
         const app = express();
         const httpContext = require('express-http-context');
         app.use(httpContext.middleware);
@@ -238,10 +216,9 @@ describe('request id in httpContext', function () {
         });
 
         await supertest(app).get('/').expect(200);
-        done();
     });
 
-    it('should have rid with custom attribute name "requestId" in req and in httpContext', async function (done) {
+    it('should have rid with custom attribute name "requestId" in req and in httpContext', async function () {
         const app = express();
         const httpContext = require('express-http-context');
         app.use(httpContext.middleware);
@@ -256,10 +233,9 @@ describe('request id in httpContext', function () {
         });
 
         await supertest(app).get('/').expect(200);
-        done();
     });
 
-    it('should not have request id in httpContext', async function (done) {
+    it('should not have request id in httpContext', async function () {
         const app = express();
         const httpContext = require('express-http-context');
         app.use(httpContext.middleware);
@@ -271,7 +247,6 @@ describe('request id in httpContext', function () {
         });
 
         await supertest(app).get('/').expect(200);
-        done();
     });
 
 });
